@@ -4,10 +4,8 @@ from ytmusicapi import YTMusic
 from pydub import AudioSegment
 import os
 import music_tag
-import requests  # request img from web
-import shutil  # save img locally
+import wget
 import re
-
 
 ytmusic = YTMusic()
 
@@ -23,12 +21,14 @@ def mdown(id, url):
                 yt = YouTube(link)
                 print(f"\nDonwloading {yt.title}")
                 fname = f"{yt.title}"
-                fname = fname.replace(" ", "\ ")
                 fname = fname.replace("/", "\/")
+                fname = fname.replace("(", "\(")
+                fname = fname.replace(")", "\)")
+                fname = fname.replace(" ", "\ ")
 
                 yt.streams.filter(only_audio=True, abr="160kbps").first().download(
                     output_path="/home/aile_/Music/", filename=f"{yt.title}.webm")
-                print("donwloaded")
+                #print("donwloaded")
                 #convert song in mp3 and remove webm file
                 webm_audio = AudioSegment.from_file(
                     f"/home/aile_/Music/{yt.title}.webm", format="webm")
@@ -37,28 +37,20 @@ def mdown(id, url):
                 os.system(f"rm /home/aile_/Music/{fname}.webm")
                 #adding metadata
                 try:
-                    print("meta")
                     f = music_tag.load_file(
                         f"/home/aile_/Music/{yt.title}.mp3")
                     f['title'] = f"{yt.title}"
                     f['artist'] = f"{yt.author}"
-                    print("\nadded\n")
+                    #print("\nadded\n")
                 except Exception as e:
                     print("\nfailed to add metadata, error: ", e)
 
                 try:
                     #adding thumbnail
                     img_url = f"{yt.thumbnail_url}"
-                    file_name = f"{yt.title}_art"
-                    res = requests.get(img_url)
-                    if res.status_code == 200:
-                        with open(file_name, 'wb') as f:
-                            shutil.copyfileobj(res.raw, f)
-                        print('artwork sucessfully Downloaded: ', file_name)
-                    else:
-                        print('artwork Couldn\'t be retrieved')
+                    file_name = wget.download(img_url)
 
-                    with open('file_name', 'rb') as img_in:
+                    with open(f'{file_name}', 'rb') as img_in:
                         f['artwork'] = img_in.read()
 
                     f.save()
@@ -67,12 +59,14 @@ def mdown(id, url):
 
                 print("\nDONE\n")
             except Exception as e:
-                print("Error: ", e, "\n")
+                #print("Error: ", e, "\n")
                 try:
                     p = Playlist(link)
                     numb = 1
                     aname = f"{p.title}"
                     aname = aname.replace(" ", "\ ")
+                    aname = aname.replace("(", "\(")
+                    aname = aname.replace(")", "\)")
                     aname = aname.replace("/", "\/")
                     print(f"Downloading {p.title}\n")
 
@@ -80,6 +74,8 @@ def mdown(id, url):
                         print(f"Downloading {song.title}")
                         fname = f"{song.title}"
                         fname = fname.replace("/", "\/")
+                        fname = fname.replace("(", "\(")
+                        fname = fname.replace(")", "\)")
                         fname = fname.replace(" ", "\ ")
                         song.streams.filter(only_audio=True, abr="160kbps").first().download(
                             output_path=f"/home/aile_/Music/{p.title}/webm/", filename=f"{str(numb)} - {song.title}.webm")
@@ -88,7 +84,40 @@ def mdown(id, url):
                             f"/home/aile_/Music/{p.title}/webm/{str(numb)} - {song.title}.webm", format="webm")
                         webm_audio.export(
                             f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title}.mp3", format="mp3")
+
+                        try:
+                            print("meta")
+                            f = music_tag.load_file(
+                                f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title}.mp3")
+                            f['title'] = f"{song.title}"
+                            f['artist'] = f"{song.author}"
+                            f['album'] = f"{p.title}"
+                            f['tracknumber'] = f"{numb}"
+                            print("\nadded\n")
+                        except Exception as e:
+                            print("\nfailed to add metadata, error: ", e)
+
+                        try:
+                            #adding thumbnail
+                            img_url = f"{song.thumbnail_url}"
+                            print(img_url)
+                            file_name = f"{song.title}_art.jpg"
+                            res = requests.get(img_url, stream=True)
+                            if res.status_code == 200:
+                                with open(file_name, 'wb') as fl:
+                                    shutil.copyfileobj(res.raw, fl)
+                                print('artwork sucessfully Downloaded: ', file_name)
+                            else:
+                                print('artwork Couldn\'t be retrieved')
+
+                            with open(f'{file_name}', 'rb') as img_in:
+                                f['artwork'] = img_in.read()
+
+                            f.save()
+                        except Exception as e:
+                            print("\nfailed to add artwork, error: ", e)
                         numb += 1
+
                     os.system(
                         f"rm -r /home/aile_/Music/{aname}/webm")
                     print("\nDONE\n")
@@ -128,7 +157,9 @@ while True:
         print(f" {n}: {title} by {artist}")
         n += 1
     sns = input(
-        f"\nType in the song/album numbers (0 to {n-1}) separated by a space : \n")
+        f"\nType in the song/album numbers (0 to {n-1}) separated by a space or search again (enter): \n")
+    if sns == "":
+        continue
     sns = sns.split(" ")
     if mode == "albums":
         id = []
