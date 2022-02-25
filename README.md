@@ -16,7 +16,13 @@ git clone https://github.com/eliamazzon/MusicDownloader.git
 ```
 Navigate to the repo directory and execute:
 ```
-install.sh
+chmod +x install.sh
+./install.sh
+```
+Launch the tool with :
+
+```
+./main.py
 ```
 
 
