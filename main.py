@@ -1,3 +1,5 @@
+#!/bin/python3
+
 from pytube import YouTube
 from pytube import Playlist
 from ytmusicapi import YTMusic
@@ -5,7 +7,6 @@ from pydub import AudioSegment
 import os
 import music_tag
 import wget
-import re
 
 ytmusic = YTMusic()
 
@@ -21,25 +22,25 @@ def mdown(id, url):
                 yt = YouTube(link)
                 print(f"\nDonwloading {yt.title}")
                 fname = f"{yt.title}"
-                fname = fname.replace("/", "\/")
+                fname = fname.replace("/", "-")
                 fname = fname.replace("(", "\(")
                 fname = fname.replace(")", "\)")
                 fname = fname.replace(" ", "\ ")
                 fname = fname.replace("'", "\'")
 
                 yt.streams.filter(only_audio=True, abr="160kbps").first().download(
-                    output_path="/home/aile_/Music/", filename=f"{yt.title}.webm")
+                    output_path="/home/aile_/Music/", filename=f"{yt.title.replace('/','-')}.webm")
                 #print("donwloaded")
                 #convert song in mp3 and remove webm file
                 webm_audio = AudioSegment.from_file(
-                    f"/home/aile_/Music/{yt.title}.webm", format="webm")
+                    f"/home/aile_/Music/{yt.title.replace('/','-')}.webm", format="webm")
                 webm_audio.export(
-                    f"/home/aile_/Music/{yt.title}.mp3", format="mp3")
+                    f"/home/aile_/Music/{yt.title.replace('/','-')}.mp3", format="mp3")
                 os.system(f"rm /home/aile_/Music/{fname}.webm")
                 #adding metadata
                 try:
                     f = music_tag.load_file(
-                        f"/home/aile_/Music/{yt.title}.mp3")
+                        f"/home/aile_/Music/{yt.title.replace('/','-')}.mp3")
                     f['title'] = f"{yt.title}"
                     f['artist'] = f"{yt.author}"
                     #print("\nadded\n")
@@ -67,6 +68,7 @@ def mdown(id, url):
                     print("\nfailed to add artwork, error: ", e)
 
                 print("\nDONE\n")
+
             except Exception as e:
                 #print("Error: ", e, "\n")
                 try:
@@ -91,16 +93,16 @@ def mdown(id, url):
                         fname = fname.replace("'", "\'")
 
                         song.streams.filter(only_audio=True, abr="160kbps").first().download(
-                            output_path=f"/home/aile_/Music/{p.title}/webm/", filename=f"{str(numb)} - {song.title}.webm")
+                            output_path=f"/home/aile_/Music/{p.title}/webm/", filename=f"{str(numb)} - {song.title.replace('/','-')}.webm")
 
                         webm_audio = AudioSegment.from_file(
-                            f"/home/aile_/Music/{p.title}/webm/{str(numb)} - {song.title}.webm", format="webm")
+                            f"/home/aile_/Music/{p.title}/webm/{str(numb)} - {song.title.replace('/','-')}.webm", format="webm")
                         webm_audio.export(
-                            f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title}.mp3", format="mp3")
+                            f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title.replace('/','-')}.mp3", format="mp3")
 
                         try:
                             f = music_tag.load_file(
-                                f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title}.mp3")
+                                f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title.replace('/','-')}.mp3")
                             f['title'] = f"{song.title}"
                             f['artist'] = f"{song.author}"
                             f['album'] = f"{p.title}"
