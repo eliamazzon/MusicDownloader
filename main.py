@@ -25,6 +25,7 @@ def mdown(id, url):
                 fname = fname.replace("(", "\(")
                 fname = fname.replace(")", "\)")
                 fname = fname.replace(" ", "\ ")
+                fname = fname.replace("'", "\'")
 
                 yt.streams.filter(only_audio=True, abr="160kbps").first().download(
                     output_path="/home/aile_/Music/", filename=f"{yt.title}.webm")
@@ -54,6 +55,14 @@ def mdown(id, url):
                         f['artwork'] = img_in.read()
 
                     f.save()
+
+                    file_name = file_name.replace("/", "\/")
+                    file_name = file_name.replace("(", "\(")
+                    file_name = file_name.replace(")", "\)")
+                    file_name = file_name.replace(" ", "\ ")
+                    file_name = file_name.replace("'", "\'")
+
+                    os.system(f'rm {file_name}')
                 except Exception as e:
                     print("\nfailed to add artwork, error: ", e)
 
@@ -68,15 +77,19 @@ def mdown(id, url):
                     aname = aname.replace("(", "\(")
                     aname = aname.replace(")", "\)")
                     aname = aname.replace("/", "\/")
+                    aname = aname.replace("'", "\'")
+
                     print(f"Downloading {p.title}\n")
 
                     for song in p.videos:
-                        print(f"Downloading {song.title}")
+                        print(f"\nDownloading {song.title}")
                         fname = f"{song.title}"
                         fname = fname.replace("/", "\/")
                         fname = fname.replace("(", "\(")
                         fname = fname.replace(")", "\)")
                         fname = fname.replace(" ", "\ ")
+                        fname = fname.replace("'", "\'")
+
                         song.streams.filter(only_audio=True, abr="160kbps").first().download(
                             output_path=f"/home/aile_/Music/{p.title}/webm/", filename=f"{str(numb)} - {song.title}.webm")
 
@@ -86,34 +99,35 @@ def mdown(id, url):
                             f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title}.mp3", format="mp3")
 
                         try:
-                            print("meta")
                             f = music_tag.load_file(
                                 f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title}.mp3")
                             f['title'] = f"{song.title}"
                             f['artist'] = f"{song.author}"
                             f['album'] = f"{p.title}"
                             f['tracknumber'] = f"{numb}"
-                            print("\nadded\n")
                         except Exception as e:
                             print("\nfailed to add metadata, error: ", e)
 
                         try:
                             #adding thumbnail
                             img_url = f"{song.thumbnail_url}"
-                            print(img_url)
-                            file_name = f"{song.title}_art.jpg"
-                            res = requests.get(img_url, stream=True)
-                            if res.status_code == 200:
-                                with open(file_name, 'wb') as fl:
-                                    shutil.copyfileobj(res.raw, fl)
-                                print('artwork sucessfully Downloaded: ', file_name)
-                            else:
-                                print('artwork Couldn\'t be retrieved')
+                            file_name = wget.download(img_url)
+
+                            with open(f'{file_name}', 'rb') as img_in:
+                                f['artwork'] = img_in.read()
 
                             with open(f'{file_name}', 'rb') as img_in:
                                 f['artwork'] = img_in.read()
 
                             f.save()
+
+                            file_name = file_name.replace("/", "\/")
+                            file_name = file_name.replace("(", "\(")
+                            file_name = file_name.replace(")", "\)")
+                            file_name = file_name.replace(" ", "\ ")
+                            file_name = file_name.replace("'", "\'")
+
+                            os.system(f'rm {file_name}')
                         except Exception as e:
                             print("\nfailed to add artwork, error: ", e)
                         numb += 1
@@ -157,7 +171,7 @@ while True:
         print(f" {n}: {title} by {artist}")
         n += 1
     sns = input(
-        f"\nType in the song/album numbers (0 to {n-1}) separated by a space or search again (enter): \n")
+        f"\nType in the song/album numbers (0 to {n-1}) separated by a space or search again (enter): ")
     if sns == "":
         continue
     sns = sns.split(" ")
