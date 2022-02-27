@@ -17,7 +17,6 @@ def term_text(txt):  # formatting text to be terminal friendly
     txt = txt.replace("(", "\(")
     txt = txt.replace(")", "\)")
     txt = txt.replace("'", "\'")
-    txt = txt.replace("/", "-")
     return txt
 
 
@@ -29,7 +28,7 @@ def down_song(link):
         output_path=f"{path}", filename=f"{yt.title.replace('/','-')}.webm")
 
     mp3_conv(file_path, file_path.replace("webm", "mp3"))
-    tags_and_art(f"{path}{song.title.replace('/','-')}.mp3",
+    tags_and_art(file_path.replace("webm", "mp3"),
                  yt.title, None, yt.author, None, yt.thumbnail_url)
 
     os.system(f"rm -r {term_text(file_path)}")
@@ -61,7 +60,8 @@ def tags_and_art(file_path, song_name, album, author, trk_nmbr, art_link):
     f = music_tag.load_file(file_path)
     f['title'] = song_name
     f['artist'] = author
-    f['album'] = album
+    if album != None:
+        f['album'] = album
     if trk_nmbr != None:
         f['tracknumber'] = trk_nmbr
     file_name = wget.download(art_link)
@@ -81,6 +81,14 @@ def mp3_conv(file_path, out_path):
 def mdown(id, url):
     if id == None:
         link = url
+        try:
+            down_song(link)
+
+        except Exception as e:
+            try:
+                down_plist(link)
+            except Exception as e:
+                print("down_plist error: ", e)
     else:
         for i in id:
             link = "https://music.youtube.com/"+i
