@@ -9,6 +9,73 @@ import music_tag
 import wget
 
 ytmusic = YTMusic()
+path = "/home/aile_/Music/"
+
+
+def term_text(txt):  # formatting text to be terminal friendly
+    txt = txt.replace(" ", "\ ")
+    txt = txt.replace("(", "\(")
+    txt = txt.replace(")", "\)")
+    txt = txt.replace("'", "\'")
+    txt = txt.replace("/", "-")
+    return txt
+
+
+def down_song(link):
+    yt = YouTube(link)
+    print(f"\nDonwloading {yt.title}")
+    file_path = f"{path}{yt.title.replace('/','-')}.webm"
+    yt.streams.filter(only_audio=True, abr="160kbps").first().download(
+        output_path=f"{path}", filename=f"{yt.title.replace('/','-')}.webm")
+
+    mp3_conv(file_path, file_path.replace("webm", "mp3"))
+    tags_and_art(f"{path}{song.title.replace('/','-')}.mp3",
+                 yt.title, None, yt.author, None, yt.thumbnail_url)
+
+    os.system(f"rm -r {term_text(file_path)}")
+    print("\nDONE\n")
+
+
+def down_plist(link):
+    p = Playlist(link)
+    title = p.title.replace("Album - ", "")
+    numb = 1
+    print(f"Downloading {title}\n")
+    file_path = f"{path}{title}/webm/"
+
+    for song in p.videos:
+        print(f"\nDownloading {song.title}")
+        song.streams.filter(only_audio=True, abr="160kbps").first().download(
+            output_path=f"{path}{title}/webm/", filename=f"{str(numb)} - {song.title.replace('/','-')}.webm")
+        mp3_conv(f"{file_path}{str(numb)} - {song.title.replace('/','-')}.webm",
+                 f"{path}{title}/{song.title.replace('/','-')}.mp3")
+        tags_and_art(f"{path}{title}/{song.title.replace('/','-')}.mp3",
+                     song.title, title, song.author, str(numb), song.thumbnail_url)
+        numb += 1
+
+    os.system(f"rm -r {term_text(file_path[:-1])}")
+    print("\nDONE\n")
+
+
+def tags_and_art(file_path, song_name, album, author, trk_nmbr, art_link):
+    f = music_tag.load_file(file_path)
+    f['title'] = song_name
+    f['artist'] = author
+    f['album'] = album
+    if trk_nmbr != None:
+        f['tracknumber'] = trk_nmbr
+    file_name = wget.download(art_link)
+    with open(f'{file_name}', 'rb') as img_in:
+        f['artwork'] = img_in.read()
+    f.save()
+    os.system(f'rm {term_text(file_name)}')
+
+
+def mp3_conv(file_path, out_path):
+    webm_audio = AudioSegment.from_file(
+        f"{file_path}", format="webm")
+    webm_audio.export(
+        f"{out_path}", format="mp3")
 
 
 def mdown(id, url):
@@ -18,127 +85,13 @@ def mdown(id, url):
         for i in id:
             link = "https://music.youtube.com/"+i
             try:
-                #donwload song in webm
-                yt = YouTube(link)
-                print(f"\nDonwloading {yt.title}")
-                fname = f"{yt.title}"
-                fname = fname.replace("/", "-")
-                fname = fname.replace("(", "\(")
-                fname = fname.replace(")", "\)")
-                fname = fname.replace(" ", "\ ")
-                fname = fname.replace("'", "\'")
-
-                yt.streams.filter(only_audio=True, abr="160kbps").first().download(
-                    output_path="/home/aile_/Music/", filename=f"{yt.title.replace('/','-')}.webm")
-                #print("donwloaded")
-                #convert song in mp3 and remove webm file
-                webm_audio = AudioSegment.from_file(
-                    f"/home/aile_/Music/{yt.title.replace('/','-')}.webm", format="webm")
-                webm_audio.export(
-                    f"/home/aile_/Music/{yt.title.replace('/','-')}.mp3", format="mp3")
-                os.system(f"rm /home/aile_/Music/{fname}.webm")
-                #adding metadata
-                try:
-                    f = music_tag.load_file(
-                        f"/home/aile_/Music/{yt.title.replace('/','-')}.mp3")
-                    f['title'] = f"{yt.title}"
-                    f['artist'] = f"{yt.author}"
-                    #print("\nadded\n")
-                except Exception as e:
-                    print("\nfailed to add metadata, error: ", e)
-
-                try:
-                    #adding thumbnail
-                    img_url = f"{yt.thumbnail_url}"
-                    file_name = wget.download(img_url)
-
-                    with open(f'{file_name}', 'rb') as img_in:
-                        f['artwork'] = img_in.read()
-
-                    f.save()
-
-                    file_name = file_name.replace("/", "\/")
-                    file_name = file_name.replace("(", "\(")
-                    file_name = file_name.replace(")", "\)")
-                    file_name = file_name.replace(" ", "\ ")
-                    file_name = file_name.replace("'", "\'")
-
-                    os.system(f'rm {file_name}')
-                except Exception as e:
-                    print("\nfailed to add artwork, error: ", e)
-
-                print("\nDONE\n")
+                down_song(link)
 
             except Exception as e:
-                #print("Error: ", e, "\n")
                 try:
-                    p = Playlist(link)
-                    numb = 1
-                    aname = f"{p.title}"
-                    aname = aname.replace(" ", "\ ")
-                    aname = aname.replace("(", "\(")
-                    aname = aname.replace(")", "\)")
-                    aname = aname.replace("/", "\/")
-                    aname = aname.replace("'", "\'")
-
-                    print(f"Downloading {p.title}\n")
-
-                    for song in p.videos:
-                        print(f"\nDownloading {song.title}")
-                        fname = f"{song.title}"
-                        fname = fname.replace("/", "\/")
-                        fname = fname.replace("(", "\(")
-                        fname = fname.replace(")", "\)")
-                        fname = fname.replace(" ", "\ ")
-                        fname = fname.replace("'", "\'")
-
-                        song.streams.filter(only_audio=True, abr="160kbps").first().download(
-                            output_path=f"/home/aile_/Music/{p.title}/webm/", filename=f"{str(numb)} - {song.title.replace('/','-')}.webm")
-
-                        webm_audio = AudioSegment.from_file(
-                            f"/home/aile_/Music/{p.title}/webm/{str(numb)} - {song.title.replace('/','-')}.webm", format="webm")
-                        webm_audio.export(
-                            f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title.replace('/','-')}.mp3", format="mp3")
-
-                        try:
-                            f = music_tag.load_file(
-                                f"/home/aile_/Music/{p.title}/{str(numb)} - {song.title.replace('/','-')}.mp3")
-                            f['title'] = f"{song.title}"
-                            f['artist'] = f"{song.author}"
-                            f['album'] = f"{p.title}"
-                            f['tracknumber'] = f"{numb}"
-                        except Exception as e:
-                            print("\nfailed to add metadata, error: ", e)
-
-                        try:
-                            #adding thumbnail
-                            img_url = f"{song.thumbnail_url}"
-                            file_name = wget.download(img_url)
-
-                            with open(f'{file_name}', 'rb') as img_in:
-                                f['artwork'] = img_in.read()
-
-                            with open(f'{file_name}', 'rb') as img_in:
-                                f['artwork'] = img_in.read()
-
-                            f.save()
-
-                            file_name = file_name.replace("/", "\/")
-                            file_name = file_name.replace("(", "\(")
-                            file_name = file_name.replace(")", "\)")
-                            file_name = file_name.replace(" ", "\ ")
-                            file_name = file_name.replace("'", "\'")
-
-                            os.system(f'rm {file_name}')
-                        except Exception as e:
-                            print("\nfailed to add artwork, error: ", e)
-                        numb += 1
-
-                    os.system(
-                        f"rm -r /home/aile_/Music/{aname}/webm")
-                    print("\nDONE\n")
+                    down_plist(link)
                 except Exception as e:
-                    print(f"\nSomething went wrong: {e}\n")
+                    print("down_plist error: ", e)
 
 
 while True:
