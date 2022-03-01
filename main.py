@@ -87,15 +87,15 @@ def mdown(id, url):
         except Exception as e:
             try:
                 down_plist(link)
-            except Exception as e:
-                print("down_plist error: ", e)
+            except Exception as err:
+                print("down_plist error: ", err)
     else:
         for i in id:
             link = "https://music.youtube.com/"+i
             try:
                 down_song(link)
 
-            except Exception as e:
+            except Exception as er:
                 try:
                     down_plist(link)
                 except Exception as e:
