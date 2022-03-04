@@ -7,6 +7,7 @@ from pydub import AudioSegment
 import os
 import music_tag
 import wget
+from PIL import Image
 
 ytmusic = YTMusic()
 
@@ -33,12 +34,16 @@ def down_song(link):
     file_path = f"{path}{yt.author.replace(' - Topic', '')} - {yt.title.replace('/','-')}.webm"
     yt.streams.filter(only_audio=True, abr="160kbps").first().download(
         output_path=f"{path}", filename=f"{yt.author.replace(' - Topic', '')} - {yt.title.replace('/','-')}.webm")
+    try:
+        mp3_conv(file_path, file_path.replace("webm", "mp3"))
+        tags_and_art(file_path.replace("webm", "mp3"),
+                     yt.title, None, yt.author.replace(' - Topic', ''), None, yt.thumbnail_url)
 
-    mp3_conv(file_path, file_path.replace("webm", "mp3"))
-    tags_and_art(file_path.replace("webm", "mp3"),
-                 yt.title, None, yt.author.replace(' - Topic', ''), None, yt.thumbnail_url)
+    except Exception as e:
+        print(e)
 
     os.system(f"rm -r {term_text(file_path)}")
+
     print("\nDONE\n")
 
 
@@ -53,10 +58,14 @@ def down_plist(link):
         print(f"\nDownloading {song.title}")
         song.streams.filter(only_audio=True, abr="160kbps").first().download(
             output_path=f"{path}{title}/webm/", filename=f"{str(numb)} - {song.title.replace('/','-')}.webm")
-        mp3_conv(f"{file_path}{str(numb)} - {song.title.replace('/','-')}.webm",
-                 f"{path}{title}/{song.title.replace('/','-')}.mp3")
-        tags_and_art(f"{path}{title}/{song.title.replace('/','-')}.mp3",
-                     song.title, title, song.author.replace(' - Topic', ''), str(numb), song.thumbnail_url)
+        try:
+            mp3_conv(f"{file_path}{str(numb)} - {song.title.replace('/','-')}.webm",
+                     f"{path}{title}/{song.title.replace('/','-')}.mp3")
+            tags_and_art(f"{path}{title}/{song.title.replace('/','-')}.mp3",
+                         song.title, title, song.author.replace(' - Topic', ''), str(numb), song.thumbnail_url)
+
+        except Exception as e:
+            print(e)
         numb += 1
 
     os.system(f"rm -r {term_text(file_path[:-1])}")
@@ -72,9 +81,13 @@ def tags_and_art(file_path, song_name, album, author, trk_nmbr, art_link):
     if trk_nmbr != None:
         f['tracknumber'] = trk_nmbr
     file_name = wget.download(art_link)
-    with open(f'{file_name}', 'rb') as img_in:
+    fl_nm = Image.open(file_name)
+    file_name_cr = fl_nm.crop((140, 60, 500, 420))
+    file_name_cr.save("img.jpg")
+    with open("img.jpg", 'rb') as img_in:
         f['artwork'] = img_in.read()
     f.save()
+    os.system('rm img.jpg')
     os.system(f'rm {term_text(file_name)}')
 
 
