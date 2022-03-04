@@ -9,7 +9,14 @@ import music_tag
 import wget
 
 ytmusic = YTMusic()
-path = "/home/aile_/Music/"
+
+if os.path.isfile("path.txt") == False:
+    path = input("Paste here ur preferred download directory: ").strip()
+    with open('path.txt', 'w') as f:
+        f.write(path)
+else:
+    with open('path.txt', 'r') as f:
+        path = f.read().strip()
 
 
 def term_text(txt):  # formatting text to be terminal friendly
@@ -23,13 +30,13 @@ def term_text(txt):  # formatting text to be terminal friendly
 def down_song(link):
     yt = YouTube(link)
     print(f"\nDonwloading {yt.title}")
-    file_path = f"{path}{yt.title.replace('/','-')}.webm"
+    file_path = f"{path}{yt.author.replace(' - Topic', '')} - {yt.title.replace('/','-')}.webm"
     yt.streams.filter(only_audio=True, abr="160kbps").first().download(
-        output_path=f"{path}", filename=f"{yt.title.replace('/','-')}.webm")
+        output_path=f"{path}", filename=f"{yt.author.replace(' - Topic', '')} - {yt.title.replace('/','-')}.webm")
 
     mp3_conv(file_path, file_path.replace("webm", "mp3"))
     tags_and_art(file_path.replace("webm", "mp3"),
-                 yt.title, None, yt.author, None, yt.thumbnail_url)
+                 yt.title, None, yt.author.replace(' - Topic', ''), None, yt.thumbnail_url)
 
     os.system(f"rm -r {term_text(file_path)}")
     print("\nDONE\n")
@@ -49,7 +56,7 @@ def down_plist(link):
         mp3_conv(f"{file_path}{str(numb)} - {song.title.replace('/','-')}.webm",
                  f"{path}{title}/{song.title.replace('/','-')}.mp3")
         tags_and_art(f"{path}{title}/{song.title.replace('/','-')}.mp3",
-                     song.title, title, song.author, str(numb), song.thumbnail_url)
+                     song.title, title, song.author.replace(' - Topic', ''), str(numb), song.thumbnail_url)
         numb += 1
 
     os.system(f"rm -r {term_text(file_path[:-1])}")
