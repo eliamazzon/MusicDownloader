@@ -52,16 +52,16 @@ def down_plist(link):
     title = p.title.replace("Album - ", "")
     numb = 1
     print(f"Downloading {title}\n")
-    file_path = f"{path}{title}/webm/"
 
     for song in p.videos:
+        file_path = f"{path}{song.author.replace(' - Topic', '')} - {title}/webm/"
         print(f"\nDownloading {song.title}")
         song.streams.filter(only_audio=True, abr="160kbps").first().download(
-            output_path=f"{path}{title}/webm/", filename=f"{str(numb)} - {song.title.replace('/','-')}.webm")
+            output_path=f"{path}{song.author.replace(' - Topic', '')} - {title}/webm/", filename=f"{str(numb)} - {song.title.replace('/','-')}.webm")
         try:
             mp3_conv(f"{file_path}{str(numb)} - {song.title.replace('/','-')}.webm",
-                     f"{path}{title}/{song.title.replace('/','-')}.mp3")
-            tags_and_art(f"{path}{title}/{song.title.replace('/','-')}.mp3",
+                     f"{path}{song.author.replace(' - Topic', '')} - {title}/{song.title.replace('/','-')}.mp3")
+            tags_and_art(f"{path}{song.author.replace(' - Topic', '')} - {title}/{song.title.replace('/','-')}.mp3",
                          song.title, title, song.author.replace(' - Topic', ''), str(numb), song.thumbnail_url)
 
         except Exception as e:
