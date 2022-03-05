@@ -1,3 +1,3 @@
 #!/bin/bash
 cd
-konsole -e .//Documents/CODING/python/mdwn/main.py
+konsole -e ./~/Documents/CODING/python/mdwn/main.py

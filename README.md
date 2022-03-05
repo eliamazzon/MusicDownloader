@@ -1,6 +1,6 @@
 # MusicDownloader
-Text-based tool to download music in mp3 with tags and artworks. 
-Support search, and youtube/yt-music links. 
+Text-based tool to download music in mp3 with tags and artworks.
+Support search, and youtube/yt-music links.
 
 ## Requirements
 
@@ -25,4 +25,6 @@ Launch the tool with :
 ./main.py
 ```
 
-
+## To Do
+Implement asynchronous downloads and functions
+Implement UI
