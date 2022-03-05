@@ -24,7 +24,6 @@ def term_text(txt):  # formatting text to be terminal friendly
     txt = txt.replace(" ", "\ ")
     txt = txt.replace("(", "\(")
     txt = txt.replace(")", "\)")
-    txt = txt.replace("'", "\'")
     return txt
 
 
@@ -142,9 +141,11 @@ while True:
     else:
         print("sorry try again")
         continue
-
-    results = ytmusic.search(
-        input("\nType the song/album name here: "), filter=f"{mode}")
+    try:
+        results = ytmusic.search(
+            input("\nType the song/album name here (enter to go back) : "), filter=f"{mode}")
+    except:
+        continue
     print("\nHere's what we found: \n")
     n = 0
     for song in results:
@@ -157,7 +158,7 @@ while True:
         f"\nType in the song/album numbers (0 to {n-1}) separated by a space or search again (enter): ")
     if sns == "":
         continue
-    sns = sns.split(" ")
+    sns = (sns.strip()).split(" ")
     if mode == "albums":
         id = []
         for s in sns:
