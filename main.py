@@ -18,6 +18,11 @@ if os.path.isfile("path.txt") == False:
 else:
     with open('path.txt', 'r') as f:
         path = f.read().strip()
+    if input(f"Current Download path: {path} - wanna update? (y/n)").strip()=="y":
+        path = input("Paste here ur preferred download directory: ").strip()
+        with open('path.txt', 'w') as f:
+            f.write(path)    
+
 
 
 def term_text(txt):  # formatting text to be terminal friendly

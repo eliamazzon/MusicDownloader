@@ -1,3 +1,0 @@
-#!/bin/bash
-cd
-konsole -e ./~/Documents/CODING/python/mdwn/main.py
