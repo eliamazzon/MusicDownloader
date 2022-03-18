@@ -26,5 +26,6 @@ Launch the tool with :
 ```
 
 ## To Do
-Implement asynchronous downloads and functions
-Implement UI
+- Implement asynchronous downloads.
+- Create UI
+- Port to mobile
