@@ -18,11 +18,10 @@ if os.path.isfile("path.txt") == False:
 else:
     with open('path.txt', 'r') as f:
         path = f.read().strip()
-    if input(f"Current Download path: {path} - wanna update? (y/n)").strip()=="y":
+    if input(f"Current Download path: {path} - wanna update? (y/n)").strip() == "y":
         path = input("Paste here ur preferred download directory: ").strip()
         with open('path.txt', 'w') as f:
-            f.write(path)    
-
+            f.write(path)
 
 
 def term_text(txt):  # formatting text to be terminal friendly
@@ -44,7 +43,7 @@ def down_song(link):
                      yt.title, None, yt.author.replace(' - Topic', ''), None, yt.thumbnail_url)
 
     except Exception as e:
-        print(e)
+        print("down_song failed: ", e)
 
     os.system(f"rm -r {term_text(file_path)}")
 
@@ -69,7 +68,7 @@ def down_plist(link):
                          song.title, title, song.author.replace(' - Topic', ''), str(numb), song.thumbnail_url)
 
         except Exception as e:
-            print(e)
+            print("down_song failed: ", e)
         numb += 1
 
     os.system(f"rm -r {term_text(file_path[:-1])}")
