@@ -43,7 +43,7 @@ def down_song(link):
                      yt.title, None, yt.author.replace(' - Topic', ''), None, yt.thumbnail_url)
 
     except Exception as e:
-        print("down_song failed: ", e)
+        return("mp3_conv or tags_and_art failed: ", e)
 
     os.system(f"rm -r {term_text(file_path)}")
 
@@ -68,7 +68,7 @@ def down_plist(link):
                          song.title, title, song.author.replace(' - Topic', ''), str(numb), song.thumbnail_url)
 
         except Exception as e:
-            print("down_song failed: ", e)
+            return("mp3_conv or tags_and_art failed: ", e)
         numb += 1
 
     os.system(f"rm -r {term_text(file_path[:-1])}")
@@ -108,6 +108,8 @@ def mdown(id, url):
             down_song(link)
 
         except Exception as e:
+            print("down_song error: ", err)
+
             try:
                 down_plist(link)
             except Exception as err:
