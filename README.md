@@ -7,7 +7,7 @@ Support search, and youtube/yt-music links.
 - python 3.x
 - pip
 
-## Installation
+## Installation (Linux, MacOS)
 
 Clone the repository with:
 
@@ -18,6 +18,24 @@ Navigate to the repo directory and execute:
 ```
 chmod +x install.sh
 ./install.sh
+```
+Launch the tool with :
+
+```
+./main.py
+```
+
+## Installation (Termux)
+
+Clone the repository with:
+
+```
+git clone https://github.com/eliamazzon/MusicDownloader.git
+```
+Navigate to the repo directory and execute:
+```
+chmod +x termux_install.sh
+./termux_install.sh
 ```
 Launch the tool with :
 
