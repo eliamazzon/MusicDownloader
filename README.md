@@ -1,4 +1,4 @@
-# MusicDownloader
+# MD (Music Downloader)
 Text-based tool to download music in mp3 with tags and artworks.
 Support search, and youtube/yt-music urls.
 
