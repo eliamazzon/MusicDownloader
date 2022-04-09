@@ -108,7 +108,7 @@ def mdown(id, url):
             down_song(link)
 
         except Exception as e:
-            print("down_song error: ", e)
+            #print("down_song error: ", e)
 
             try:
                 down_plist(link)
