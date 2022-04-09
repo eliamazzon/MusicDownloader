@@ -1,26 +1,29 @@
 #!/bin/python3
 
-from pytube import YouTube
-from pytube import Playlist
+from pytube import YouTube  # library to donwload songs and urls
+from pytube import Playlist  # library do donwload playlists
+# library to gather ytmusic search results with urls, artworks and other metadatas
 from ytmusicapi import YTMusic
-from pydub import AudioSegment
+from pydub import AudioSegment  # lib to convert audio formats
+# execute os level commands, used to clean temporary files (webm) after download
 import os
-import music_tag
-import wget
-from PIL import Image
+import music_tag  # lib to add tags and artworks to mp3 files
+import wget  # (wget) gather files from the web
+from PIL import Image  # image manipulation, used to crop artworks from yt canvas
 
 ytmusic = YTMusic()
 
+# check if the path variable is not define and ask the user to define one
 if os.path.isfile("path.txt") == False:
     path = input("Paste here ur preferred download directory: ").strip()
     with open('path.txt', 'w') as f:
         f.write(path)
-else:
+else:  # if the path_var is defined ask the user if he wanna update it
     with open('path.txt', 'r') as f:
         path = f.read().strip()
     if input(f"Current Download path: {path} - wanna update? (y/n)").strip() == "y":
         path = input("Paste here ur preferred download directory: ").strip()
-        with open('path.txt', 'w') as f:
+        with open('path.txt', 'w') as f:  # write the new path_var to the file
             f.write(path)
 
 
@@ -31,7 +34,7 @@ def term_text(txt):  # formatting text to be terminal friendly
     return txt
 
 
-def down_song(link):
+def down_song(link):  # function to download songs
     yt = YouTube(link)
     print(f"\nDonwloading {yt.title}")
     file_path = f"{path}{yt.author.replace(' - Topic', '')} - {yt.title.replace('/','-')}.webm"
@@ -45,12 +48,12 @@ def down_song(link):
     except Exception as e:
         return("mp3_conv or tags_and_art failed: ", e)
 
-    os.system(f"rm -r {term_text(file_path)}")
+    os.system(f"rm -r {term_text(file_path)}")  # clean webm files
 
     print("\nDONE\n")
 
 
-def down_plist(link):
+def down_plist(link):  # function do download playlists
     p = Playlist(link)
     title = p.title.replace("Album - ", "")
     numb = 1
@@ -72,9 +75,10 @@ def down_plist(link):
         numb += 1
 
     os.system(f"rm -r {term_text(file_path[:-1])}")
-    print("\nDONE\n")
+    print("\nDONE\n")  # clean webm files
 
 
+# add tags and artwork to the mp3 files
 def tags_and_art(file_path, song_name, album, author, trk_nmbr, art_link):
     f = music_tag.load_file(file_path)
     f['title'] = song_name
@@ -93,12 +97,16 @@ def tags_and_art(file_path, song_name, album, author, trk_nmbr, art_link):
     os.system('rm img.jpg')
     os.system(f'rm {term_text(file_name)}')
 
+#convert webm to mp3
+
 
 def mp3_conv(file_path, out_path):
     webm_audio = AudioSegment.from_file(
         f"{file_path}", format="webm")
     webm_audio.export(
         f"{out_path}", format="mp3")
+
+#main function
 
 
 def mdown(id, url):
