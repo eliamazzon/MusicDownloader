@@ -1,2 +1,9 @@
 path.txt
 desktop_entry.desktop
+__pycache__
+bin
+include
+lib
+lib64
+share
+pyvenv.cfg
