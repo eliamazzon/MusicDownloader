@@ -46,3 +46,4 @@ Launch the tool with :
 ## To Do
 - Implement asynchronous downloads.
 - Create UI
+- Implement downloads from spotify links (require spotify scraper implementation, try to get class and ids informations from https://pypi.org/project/spotifyscraper/) 
