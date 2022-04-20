@@ -1,0 +1,6 @@
+pytube
+ytmusicapi
+pydub
+music_tag
+wget
+pillow
