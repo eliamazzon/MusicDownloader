@@ -1,4 +1,4 @@
-pytube
+pafy
 ytmusicapi
 pydub
 music_tag
