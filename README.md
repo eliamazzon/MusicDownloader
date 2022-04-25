@@ -12,7 +12,7 @@ Support search, and youtube/yt-music urls.
 Clone the repository with:
 
 ```
-git clone https://github.com/eliamazzon/MusicDownloader.git
+git clone --branch pafy https://github.com/eliamazzon/MusicDownloader.git
 ```
 Navigate to the repo directory and execute:
 ```
@@ -30,7 +30,7 @@ Launch the tool with :
 Clone the repository with:
 
 ```
-git clone https://github.com/eliamazzon/MusicDownloader.git
+git clone --branch pafy https://github.com/eliamazzon/MusicDownloader.git
 ```
 Navigate to the repo directory and execute:
 ```
@@ -45,5 +45,4 @@ Launch the tool with :
 
 ## To Do
 - Implement asynchronous downloads.
-- Create UI
 - Implement downloads from spotify links (require spotify scraper implementation, try to get class and ids informations from https://pypi.org/project/spotifyscraper/) 
