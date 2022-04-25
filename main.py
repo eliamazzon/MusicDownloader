@@ -1,7 +1,6 @@
 #!/bin/python3
 
-from pytube import YouTube  # library to donwload songs and urls
-from pytube import Playlist  # library do donwload playlists
+import pafy
 # library to gather ytmusic search results with urls, artworks and other metadatas
 from ytmusicapi import YTMusic
 from pydub import AudioSegment  # lib to convert audio formats
@@ -35,18 +34,19 @@ def term_text(txt):  # formatting text to be terminal friendly
 
 
 def down_song(link):  # function to download songs
-    yt = YouTube(link)
+    yt = pafy.new(link)
     print(f"\nDonwloading {yt.title}")
     file_path = f"{path}{yt.author.replace(' - Topic', '')} - {yt.title.replace('/','-')}.webm"
-    yt.streams.filter(only_audio=True, abr="160kbps").first().download(
-        output_path=f"{path}", filename=f"{yt.author.replace(' - Topic', '')} - {yt.title.replace('/','-')}.webm")
+    bestaudio = yt.getbestaudio()
+    bestaudio.download(file_path)
+    print(yt.bigthumbhd)
     try:
         mp3_conv(file_path, file_path.replace("webm", "mp3"))
         tags_and_art(file_path.replace("webm", "mp3"),
-                     yt.title, None, yt.author.replace(' - Topic', ''), None, yt.thumbnail_url)
+                     yt.title, None, yt.author.replace(' - Topic', ''), None, yt.bigthumbhd)
 
     except Exception as e:
-        return("mp3_conv or tags_and_art failed: ", e)
+        print("mp3_conv or tags_and_art failed: ", e)
 
     os.system(f"rm -r {term_text(file_path)}")  # clean webm files
 
@@ -54,21 +54,21 @@ def down_song(link):  # function to download songs
 
 
 def down_plist(link):  # function do download playlists
-    p = Playlist(link)
+    p = pafy.get_playlist(f"{link}")
     title = p.title.replace("Album - ", "")
     numb = 1
     print(f"Downloading {title}\n")
 
-    for song in p.videos:
+    for song in p:
         file_path = f"{path}{song.author.replace(' - Topic', '')} - {title}/webm/"
         print(f"\nDownloading {song.title}")
-        song.streams.filter(only_audio=True, abr="160kbps").first().download(
-            output_path=f"{path}{song.author.replace(' - Topic', '')} - {title}/webm/", filename=f"{str(numb)} - {song.title.replace('/','-')}.webm")
+        bestaudio = song.getbestaudio()
+        bestaudio.download(file_path)
         try:
             mp3_conv(f"{file_path}{str(numb)} - {song.title.replace('/','-')}.webm",
                      f"{path}{song.author.replace(' - Topic', '')} - {title}/{song.title.replace('/','-')}.mp3")
             tags_and_art(f"{path}{song.author.replace(' - Topic', '')} - {title}/{song.title.replace('/','-')}.mp3",
-                         song.title, title, song.author.replace(' - Topic', ''), str(numb), song.thumbnail_url)
+                         song.title, title, song.author.replace(' - Topic', ''), str(numb), song.bigthumbhd)
 
         except Exception as e:
             return("mp3_conv or tags_and_art failed: ", e)
@@ -89,7 +89,7 @@ def tags_and_art(file_path, song_name, album, author, trk_nmbr, art_link):
         f['tracknumber'] = trk_nmbr
     file_name = wget.download(art_link)
     fl_nm = Image.open(file_name)
-    file_name_cr = fl_nm.crop((140, 60, 500, 420))
+    file_name_cr = fl_nm.crop((105, 45, 375, 315))
     file_name_cr.save("img.jpg")
     with open("img.jpg", 'rb') as img_in:
         f['artwork'] = img_in.read()
@@ -124,15 +124,15 @@ def mdown(id, url):
                 print("down_plist error: ", err)
     else:
         for i in id:
-            link = "https://music.youtube.com/"+i
+            link = "https://www.youtube.com/"+i
             try:
-                down_song(link)
+                down_song(f"{link}")
 
             except Exception as er:
-                #print("down_song error: ", er)
+                print("down_song error: ", er)
 
                 try:
-                    down_plist(link)
+                    down_plist(f"{link}")
                 except Exception as e:
                     print("down_plist error: ", e)
 
