@@ -10,7 +10,7 @@ import os
 import music_tag  # lib to add tags and artworks to mp3 files
 import wget  # (wget) gather files from the web
 from PIL import Image  # image manipulation, used to crop artworks from yt canvas
-
+#ciaociao
 ytmusic = YTMusic()
 
 # check if the path variable is not define and ask the user to define one
